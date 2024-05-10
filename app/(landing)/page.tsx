@@ -13,7 +13,7 @@ export default function Home() {
           시작하기
         </Link>
         <div className="flex gap-1">
-          <span>이미 계정이 있나요?</span>
+          <span>이미 계정이 있으신가요?</span>
           <Link href="/login" className="hover:underline">
             로그인
           </Link>
