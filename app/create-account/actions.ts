@@ -2,6 +2,10 @@
 
 import { z } from "zod";
 
+const passwordRegex = new RegExp(
+  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/
+);
+
 function checkUsername(username: string) {
   return !username.includes("potato");
 }
@@ -21,6 +25,7 @@ const formSchema = z
         invalid_type_error: "이름은 문자열이 되어야 합니다.",
         required_error: "이름은 필수 항목입니다.",
       })
+      .trim()
       .min(3, "이름은 최소 3자 이상 입력해 주세요.")
       .max(10, "이름은 최대 10자 이하로 입력해 주세요.")
       .refine(checkUsername, "potato는 허용되지 않습니다."),
@@ -29,13 +34,18 @@ const formSchema = z
         invalid_type_error: "이메일은 문자열이 되어야 합니다.",
         required_error: "이메일은 필수 항목입니다.",
       })
-      .email(),
+      .email()
+      .toLowerCase(),
     password: z
       .string({
         invalid_type_error: "비밀번호는 문자열이 되어야 합니다.",
         required_error: "비밀번호는 필수 항목입니다.",
       })
-      .min(6, "비밀번호는 최소 6글자 이상 입력해 주세요."),
+      .min(6, "비밀번호는 최소 6글자 이상 입력해 주세요.")
+      .regex(
+        passwordRegex,
+        "비밀번호는 소문자, 대문자, 숫자, 특수문자를 포함해야 합니다."
+      ),
     confirm_password: z
       .string({
         invalid_type_error: "확인 비밀번호는 문자열이 되어야 합니다.",
@@ -58,5 +68,7 @@ export const createAccount = async (prevState: any, formData: FormData) => {
   const result = formSchema.safeParse(data);
   if (!result.success) {
     return result.error.flatten();
+  } else {
+    console.log(result.data);
   }
 };
