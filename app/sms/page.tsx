@@ -2,7 +2,6 @@
 
 import Button from "@/components/button";
 import Input from "@/components/input";
-import SocialLogin from "@/components/social-login";
 import { useFormState } from "react-dom";
 import { smsLogIn } from "./actions";
 
@@ -20,7 +19,16 @@ const SMSLogIn = () => {
         <h2 className="text-xl">Verify your phone number.</h2>
       </div>
       <form action={dispatch} className="flex flex-col gap-3">
-        {state?.token ? (
+        {!state?.token ? (
+          <Input
+            name="phone"
+            type="text"
+            placeholder="Phone number"
+            required
+            errors={state.error?.formErrors}
+            key="phone"
+          />
+        ) : (
           <Input
             name="token"
             type="number"
@@ -30,15 +38,6 @@ const SMSLogIn = () => {
             required
             errors={state.error?.formErrors}
             key="token"
-          />
-        ) : (
-          <Input
-            name="phone"
-            type="text"
-            placeholder="Phone number"
-            required
-            errors={state.error?.formErrors}
-            key="phone"
           />
         )}
         <Button
