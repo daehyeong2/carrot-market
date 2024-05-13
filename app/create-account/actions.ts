@@ -1,10 +1,11 @@
 "use server";
 
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REGEX,
+  PASSWORD_REGEX_ERROR,
+} from "@/lib/constants";
 import { z } from "zod";
-
-const passwordRegex = new RegExp(
-  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/
-);
 
 function checkUsername(username: string) {
   return !username.includes("potato");
@@ -26,8 +27,6 @@ const formSchema = z
         required_error: "이름은 필수 항목입니다.",
       })
       .trim()
-      .min(3, "이름은 최소 3자 이상 입력해 주세요.")
-      .max(10, "이름은 최대 10자 이하로 입력해 주세요.")
       .refine(checkUsername, "potato는 허용되지 않습니다."),
     email: z
       .string({
@@ -41,17 +40,20 @@ const formSchema = z
         invalid_type_error: "비밀번호는 문자열이 되어야 합니다.",
         required_error: "비밀번호는 필수 항목입니다.",
       })
-      .min(6, "비밀번호는 최소 6글자 이상 입력해 주세요.")
-      .regex(
-        passwordRegex,
-        "비밀번호는 소문자, 대문자, 숫자, 특수문자를 포함해야 합니다."
-      ),
+      .min(
+        PASSWORD_MIN_LENGTH,
+        `비밀번호는 최소 ${PASSWORD_MIN_LENGTH}글자 이상 입력해 주세요.`
+      )
+      .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
     confirm_password: z
       .string({
         invalid_type_error: "확인 비밀번호는 문자열이 되어야 합니다.",
         required_error: "확인 비밀번호는 필수 항목입니다.",
       })
-      .min(6, "비밀번호는 최소 6글자 이상 입력해 주세요."),
+      .min(
+        PASSWORD_MIN_LENGTH,
+        `비밀번호는 최소 ${PASSWORD_MIN_LENGTH}글자 이상 입력해 주세요.`
+      ),
   })
   .refine(checkPassword, {
     message: "확인 비밀번호가 일치하지 않습니다.",
