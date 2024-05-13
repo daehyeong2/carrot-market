@@ -1,4 +1,4 @@
-import FormButton from "@/components/form-button";
+import FormButton from "@/components/button";
 import FormInput from "@/components/form-input";
 import SocialLogin from "@/components/social-login";
 
