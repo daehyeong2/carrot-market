@@ -5,11 +5,8 @@ import {
   PASSWORD_REGEX,
   PASSWORD_REGEX_ERROR,
 } from "@/lib/constants";
+import db from "@/lib/db";
 import { z } from "zod";
-
-function checkUsername(username: string) {
-  return !username.includes("potato");
-}
 
 const checkPassword = ({
   password,
@@ -19,6 +16,30 @@ const checkPassword = ({
   confirm_password: string;
 }) => password === confirm_password;
 
+const checkUniqueUsername = async (username: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return !Boolean(user);
+};
+
+const checkUniqueEmail = async (email: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      id: true,
+    },
+  });
+  return !Boolean(user);
+};
+
 const formSchema = z
   .object({
     username: z
@@ -27,14 +48,15 @@ const formSchema = z
         required_error: "이름은 필수 항목입니다.",
       })
       .trim()
-      .refine(checkUsername, "potato는 허용되지 않습니다."),
+      .refine(checkUniqueUsername, "이 이름은 이미 사용 중인 이름입니다."),
     email: z
       .string({
         invalid_type_error: "이메일은 문자열이 되어야 합니다.",
         required_error: "이메일은 필수 항목입니다.",
       })
       .email()
-      .toLowerCase(),
+      .toLowerCase()
+      .refine(checkUniqueEmail, "이 이메일은 이미 사용 중인 이메일입니다."),
     password: z
       .string({
         invalid_type_error: "비밀번호는 문자열이 되어야 합니다.",
@@ -67,10 +89,9 @@ export const createAccount = async (prevState: any, formData: FormData) => {
     password: formData.get("password"),
     confirm_password: formData.get("confirm_password"),
   };
-  const result = formSchema.safeParse(data);
+  const result = await formSchema.safeParseAsync(data);
   if (!result.success) {
     return result.error.flatten();
   } else {
-    console.log(result.data);
   }
 };
