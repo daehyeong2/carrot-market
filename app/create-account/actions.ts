@@ -8,6 +8,9 @@ import {
 } from "@/lib/constants";
 import db from "@/lib/db";
 import { z } from "zod";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const checkPassword = ({
   password,
@@ -105,6 +108,14 @@ export const createAccount = async (prevState: any, formData: FormData) => {
         id: true,
       },
     });
-    console.log(user);
+    const cookie = await getIronSession(cookies(), {
+      cookieName: "session",
+      password: process.env.COOKIE_SECRET!,
+    });
+    //@ts-ignore
+    cookie.id = user.id;
+    await cookie.save();
+
+    redirect("/profile");
   }
 };
