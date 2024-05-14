@@ -26,9 +26,10 @@ const formSchema = z.object({
     .email()
     .toLowerCase()
     .refine(checkEmailExists, "이 이메일로 가입된 계정이 없습니다."),
-  password: z.string({ required_error: "비밀번호는 필수입니다." }),
-  // .min(PASSWORD_MIN_LENGTH),
-  // .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
+  password: z
+    .string({ required_error: "비밀번호는 필수입니다." })
+    .min(PASSWORD_MIN_LENGTH)
+    .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
 });
 
 export const login = async (prevState: any, formData: FormData) => {
