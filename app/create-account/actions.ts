@@ -10,6 +10,7 @@ import db from "@/lib/db";
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import getSession from "@/lib/session";
+import { LogIn } from "@/lib/utils";
 
 const checkPassword = ({
   password,
@@ -120,10 +121,7 @@ export const createAccount = async (prevState: any, formData: FormData) => {
         id: true,
       },
     });
-    const session = await getSession();
-    session.id = user.id;
-    await session.save();
-
+    await LogIn(user.id);
     redirect("/profile");
   }
 };

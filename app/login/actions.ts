@@ -7,6 +7,7 @@ import db from "@/lib/db";
 import bcrypt from "bcrypt";
 import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
+import { LogIn } from "@/lib/utils";
 
 const checkEmailExists = async (email: string) => {
   const user = await db.user.findUnique({
@@ -55,9 +56,7 @@ export const login = async (prevState: any, formData: FormData) => {
       user!.password ?? "xxxx"
     );
     if (ok) {
-      const session = await getSession();
-      session.id = user!.id;
-      await session.save();
+      await LogIn(user!.id);
       redirect("/profile");
     } else {
       return {
