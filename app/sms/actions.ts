@@ -5,6 +5,7 @@ import validator from "validator";
 import { redirect } from "next/navigation";
 import db from "@/lib/db";
 import crypto from "crypto";
+import { LogIn } from "@/lib/utils";
 
 const phoneSchema = z
   .string()
@@ -14,10 +15,23 @@ const phoneSchema = z
     "올바른 전화번호 형식으로 입력해 주세요."
   );
 
+async function tokenExists(token: number) {
+  const exists = await db.sMSToken.findUnique({
+    where: {
+      token: token.toString(),
+    },
+    select: {
+      id: true,
+    },
+  });
+  return Boolean(exists);
+}
+
 const tokenSchema = z.coerce
   .number({ required_error: "인증번호를 입력해 주세요." })
   .min(100000, "올바른 인증번호 형식으로 입력해 주세요.")
-  .max(999999, "올바른 인증번호 형식으로 입력해 주세요.");
+  .max(999999, "올바른 인증번호 형식으로 입력해 주세요.")
+  .refine(tokenExists, "존재하지 않는 토큰입니다.");
 
 interface ActionState {
   token: boolean;
@@ -44,7 +58,7 @@ export async function smsLogIn(prevState: ActionState, formData: FormData) {
   const phone = formData.get("phone");
   const token = formData.get("token");
   if (!prevState.token) {
-    const result = phoneSchema.safeParse(phone);
+    const result = await phoneSchema.safeParse(phone);
     if (!result.success) {
       return {
         token: false,
@@ -80,14 +94,29 @@ export async function smsLogIn(prevState: ActionState, formData: FormData) {
       };
     }
   } else {
-    const result = tokenSchema.safeParse(token);
+    const result = await tokenSchema.spa(token);
     if (!result.success) {
       return {
-        token: true,
         error: result.error.flatten(),
+        token: true,
       };
     } else {
-      redirect("/");
+      const token = await db.sMSToken.findUnique({
+        where: {
+          token: result.data.toString(),
+        },
+        select: {
+          id: true,
+          userId: true,
+        },
+      });
+      await LogIn(token!.userId);
+      await db.sMSToken.delete({
+        where: {
+          id: token!.id,
+        },
+      });
+      redirect("/profile");
     }
   }
 }
