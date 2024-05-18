@@ -22,7 +22,7 @@ const ListProduct = ({
     <Link href={`/products/${id}`} className="">
       <div className="flex gap-5 items-center">
         <div className="relative size-28">
-          <Image fill src={photo} alt={title} />
+          <Image fill src={photo} alt={title} className="object-cover" />
         </div>
         <div className="flex flex-col gap-1 *:text-white">
           <span className="text-2xl">{title}</span>

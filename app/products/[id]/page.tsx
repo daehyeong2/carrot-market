@@ -51,7 +51,12 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
   return (
     <div>
       <div className="relative aspect-square">
-        <Image fill src={product.photo} alt={product.title} />
+        <Image
+          fill
+          src={product.photo}
+          alt={product.title}
+          className="object-cover"
+        />
       </div>
       <div className="px-3 py-5 flex items-center gap-3 border-b border-neutral-700">
         <div className="size-10 rounded-full overflow-hidden">
@@ -61,6 +66,7 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
               alt={product.user.username}
               width={40}
               height={40}
+              className="object-cover"
             />
           ) : (
             <UserIcon className="" />
