@@ -1,11 +1,13 @@
 "use server";
 
 import { z } from "zod";
-import { PASSWORD_MIN_LENGTH, PASSWORD_REGEX_ERROR } from "../../lib/constants";
-import { PASSWORD_REGEX } from "@/lib/constants";
+import {
+  PASSWORD_REGEX,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REGEX_ERROR,
+} from "@/lib/constants";
 import db from "@/lib/db";
 import bcrypt from "bcrypt";
-import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
 import { LogIn } from "@/lib/utils";
 
