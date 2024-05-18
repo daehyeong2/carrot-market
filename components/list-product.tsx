@@ -25,8 +25,8 @@ const ListProduct = ({
           <Image fill src={photo} alt={title} className="object-cover" />
         </div>
         <div className="flex flex-col gap-1 *:text-white">
-          <span className="text-2xl">{title}</span>
-          <span className="text-xl font-semibold">{formatToWon(price)}원</span>
+          <span className="text-xl">{title}</span>
+          <span className="text-lg font-semibold">{formatToWon(price)}원</span>
           <span className="text-sm text-neutral-500">
             {formatToTimeAgo(created_at + "")}
           </span>
