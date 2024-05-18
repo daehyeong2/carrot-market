@@ -54,7 +54,7 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
         <Image fill src={product.photo} alt={product.title} />
       </div>
       <div className="px-3 py-5 flex items-center gap-3 border-b border-neutral-700">
-        <div className="size-10 rounded-full">
+        <div className="size-10 rounded-full overflow-hidden">
           {product.user.avatar ? (
             <Image
               src={product.user.avatar}
