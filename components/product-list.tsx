@@ -42,18 +42,12 @@ const ProductList = ({ initialProduct }: ProductListProps) => {
     };
   }, [page]);
   return (
-    <div className="p-5 flex flex-col gap-5 pb-32">
+    <div className="p-5 flex flex-col gap-5 pb-64">
       {products.map((product) => (
         <ListProduct key={product.id} {...product} />
       ))}
       {!isLastPage && (
-        <span
-          ref={trigger}
-          style={{
-            marginTop: `${page + 1 * 10}px`,
-          }}
-          className="opacity-0"
-        >
+        <span ref={trigger} className="opacity-0">
           {isLoading ? "더 불러오는 중.." : "더 불러오기"}
         </span>
       )}

@@ -1,7 +1,7 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { formatToWon } from "@/lib/utils";
-import { UserIcon } from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -80,10 +80,15 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
         <h1 className="text-2xl font-semibold">{product.title}</h1>
         <p>{product.description}</p>
       </div>
-      <div className="fixed w-full max-w-md bottom-0 mx-auto p-5 pb-10 bg-neutral-800 flex justify-between items-center">
-        <span className="font-semibold text-xl">
-          {formatToWon(product.price)}원
-        </span>
+      <div className="fixed w-full max-w-md bottom-0 mx-auto p-5 bg-neutral-800 flex justify-between items-center">
+        <div className="flex gap-4 items-center">
+          <Link href="/products">
+            <ChevronLeftIcon className="size-9" />
+          </Link>
+          <span className="font-semibold text-xl">
+            {formatToWon(product.price)}원
+          </span>
+        </div>
         <div className="flex items-center gap-3">
           <Link
             className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold"
