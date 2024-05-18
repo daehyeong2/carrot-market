@@ -9,7 +9,6 @@ import {
 import db from "@/lib/db";
 import { z } from "zod";
 import { redirect } from "next/navigation";
-import getSession from "@/lib/session";
 import { LogIn } from "@/lib/utils";
 
 const checkPassword = ({

@@ -5,8 +5,9 @@ import Input from "@/components/input";
 import { useFormState } from "react-dom";
 import { smsLogIn } from "./actions";
 
-const initialState = {
+const initialState: any = {
   token: false,
+  phone: "",
   error: undefined,
 };
 
@@ -25,7 +26,7 @@ const SMSLogIn = () => {
             type="text"
             placeholder="Phone number"
             required
-            errors={state.error?.formErrors}
+            errors={state?.error?.formErrors}
             key="phone"
           />
         ) : (
@@ -36,12 +37,12 @@ const SMSLogIn = () => {
             max={999999}
             placeholder="Verification code"
             required
-            errors={state.error?.formErrors}
+            errors={state?.error?.fieldErrors?.token}
             key="token"
           />
         )}
         <Button
-          text={state.token ? "인증 번호 인증하기" : "인증 번호 발송하기"}
+          text={state?.token ? "인증 번호 인증하기" : "인증 번호 발송하기"}
         />
       </form>
     </div>
