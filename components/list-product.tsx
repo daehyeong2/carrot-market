@@ -1,5 +1,7 @@
+import { formatToWon } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { formatToTimeAgo } from "../lib/utils";
 
 interface IListProductPromps {
   title: string;
@@ -18,14 +20,16 @@ const ListProduct = ({
 }: IListProductPromps) => {
   return (
     <Link href={`/products/${id}`} className="">
-      <div className="flex gap-5">
-        <div className="relative w-52">
+      <div className="flex gap-5 items-center">
+        <div className="relative size-28">
           <Image fill src={photo} alt={title} />
         </div>
         <div className="flex flex-col gap-1 *:text-white">
-          <span className="text-xl">{title}</span>
-          <span className="text-lg font-semibold">{price}</span>
-          <span className="text-sm text-neutral-500">{created_at + ""}</span>
+          <span className="text-2xl">{title}</span>
+          <span className="text-xl font-semibold">{formatToWon(price)}원</span>
+          <span className="text-sm text-neutral-500">
+            {formatToTimeAgo(created_at + "")}
+          </span>
         </div>
       </div>
     </Link>
