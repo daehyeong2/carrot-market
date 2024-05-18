@@ -14,6 +14,7 @@ const productSchema = z.object({
   title: z
     .string({
       required_error: "제목을 입력해 주세요.",
+      invalid_type_error: "파일을 업로드해 주세요.",
     })
     .min(3, "제목을 최소 3자 이상 입력해 주세요."),
   description: z
