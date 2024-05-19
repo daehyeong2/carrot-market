@@ -1,17 +1,18 @@
-import { getIsOwner, getProduct } from "@/app/home/[id]/page";
 import CloseButton from "@/components/close-button";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { formatToWon } from "@/lib/utils";
+import { formatToWon, getProduct } from "@/lib/utils";
 import Link from "next/link";
 import DeleteButton from "./delete-button";
+import getSession from "@/lib/session";
 
 const Modal = async ({ params }: { params: { id: string } }) => {
   const id = Number(params.id);
   if (isNaN(id)) return notFound();
   const product = await getProduct(id);
   if (!product) return notFound();
-  const isOwner = await getIsOwner(product.userId);
+  const session = await getSession();
+  const isOwner = session.id === product.userId;
   return (
     <div className="absolute z-50 w-full h-full flex items-center justify-center left-0 top-0 bg-black bg-opacity-60">
       <CloseButton />

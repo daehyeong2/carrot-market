@@ -1,6 +1,6 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
-import { formatToWon } from "@/lib/utils";
+import { formatToWon, getProduct } from "@/lib/utils";
 import {
   ChevronLeftIcon,
   TrashIcon,
@@ -10,32 +10,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { unstable_cache as nextCache, revalidateTag } from "next/cache";
-
-export async function getIsOwner(userId: number) {
-  const session = await getSession();
-  if (session.id) {
-    return session.id === userId;
-  }
-  return false;
-}
-
-export async function getProduct(id: number) {
-  console.log("product");
-  const product = await db.product.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      user: {
-        select: {
-          username: true,
-          avatar: true,
-        },
-      },
-    },
-  });
-  return product;
-}
 
 const getCachedProduct = nextCache(getProduct, ["product-detail"], {
   tags: ["product-detail"],
@@ -72,7 +46,8 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
   if (isNaN(id)) return notFound();
   const product = await getCachedProduct(id);
   if (!product) return notFound();
-  const isOwner = await getIsOwner(product.userId);
+  const session = await getSession();
+  const isOwner = session.id === product.userId;
   const onDelete = async () => {
     "use server";
     if (!isOwner) return;

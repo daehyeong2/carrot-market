@@ -1,3 +1,4 @@
+import db from "./db";
 import getSession from "./session";
 
 export const LogIn = async (id: number) => {
@@ -17,4 +18,22 @@ export function formatToTimeAgo(date: string): string {
   const diff = Math.round((time - now) / dayInMs);
   const formatter = new Intl.RelativeTimeFormat("ko");
   return formatter.format(diff, "days");
+}
+
+export async function getProduct(id: number) {
+  console.log("product");
+  const product = await db.product.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      user: {
+        select: {
+          username: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+  return product;
 }

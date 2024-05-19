@@ -1,4 +1,5 @@
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
+import Image from "next/image";
 import Link from "next/link";
 
 const SocialLogin = () => {
@@ -11,7 +12,7 @@ const SocialLogin = () => {
           href="/github/start"
         >
           <span>
-            <img className="size-6" src="/github.svg" alt="Github Logo" />
+            <Image className="size-6" src="/github.svg" alt="Github Logo" />
           </span>
           <span>Continue with Github</span>
         </Link>
