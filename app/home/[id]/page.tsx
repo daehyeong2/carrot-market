@@ -16,7 +16,6 @@ const getCachedProduct = nextCache(getProduct, ["product-detail"], {
 });
 
 async function getProductTitle(id: number) {
-  console.log("title");
   const product = await db.product.findUnique({
     where: {
       id,
@@ -46,8 +45,9 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
   if (isNaN(id)) return notFound();
   const product = await getCachedProduct(id);
   if (!product) return notFound();
-  const session = await getSession();
-  const isOwner = session.id === product.userId;
+  // const session = await getSession();
+  // const isOwner = session.id === product.userId;
+  const isOwner = false;
   const onDelete = async () => {
     "use server";
     if (!isOwner) return;
@@ -122,3 +122,14 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
 };
 
 export default ProductDetail;
+
+export async function generateStaticParams() {
+  const products = await db.product.findMany({
+    select: {
+      id: true,
+    },
+  });
+  return products.map((product) => ({
+    id: product.id + "",
+  }));
+}
