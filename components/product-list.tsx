@@ -1,9 +1,9 @@
 "use client";
 
-import { InitialProducts } from "@/app/(tabs)/products/page";
+import { InitialProducts } from "@/app/(tabs)/home/page";
 import ListProduct from "./list-product";
 import { useEffect, useRef, useState } from "react";
-import { getMoreProducts } from "@/app/(tabs)/products/actions";
+import { getMoreProducts } from "@/app/(tabs)/home/actions";
 
 interface ProductListProps {
   initialProduct: InitialProducts;
@@ -46,11 +46,11 @@ const ProductList = ({ initialProduct }: ProductListProps) => {
       {products.map((product) => (
         <ListProduct key={product.id} {...product} />
       ))}
-      {!isLastPage && (
+      {/* {!isLastPage && (
         <span ref={trigger} className="opacity-0">
           {isLoading ? "더 불러오는 중.." : "더 불러오기"}
         </span>
-      )}
+      )} */}
     </div>
   );
 };

@@ -9,6 +9,7 @@ interface IListProductPromps {
   created_at: Date;
   photo: string;
   id: number;
+  key: number;
 }
 
 const ListProduct = ({
@@ -19,7 +20,7 @@ const ListProduct = ({
   id,
 }: IListProductPromps) => {
   return (
-    <Link href={`/products/${id}`} className="">
+    <Link href={`/home/${id}`} className="">
       <div className="flex gap-5 items-center">
         <div className="relative size-28 rounded-md overflow-hidden">
           <Image

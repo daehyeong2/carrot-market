@@ -6,7 +6,7 @@ import { onDelete } from "./actins";
 const DeleteButton = ({ id, isOwner }: { id: number; isOwner: boolean }) => {
   const onClick = async () => {
     await onDelete(id, isOwner);
-    window.location.href = "/products";
+    window.location.href = "/home";
   };
   return (
     <form action={onClick}>

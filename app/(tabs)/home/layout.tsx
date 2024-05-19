@@ -9,8 +9,8 @@ const ProductsLayout = ({
 }) => {
   return (
     <>
-      {children}
       {modal}
+      {children}
     </>
   );
 };

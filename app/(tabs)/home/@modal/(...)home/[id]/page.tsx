@@ -1,4 +1,4 @@
-import { getIsOwner, getProduct } from "@/app/products/[id]/page";
+import { getIsOwner, getProduct } from "@/app/home/[id]/page";
 import CloseButton from "@/components/close-button";
 import Image from "next/image";
 import { notFound } from "next/navigation";

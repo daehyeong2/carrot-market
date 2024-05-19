@@ -35,6 +35,15 @@ export async function getProduct(id: number) {
   return product;
 }
 
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const id = Number(params.id);
+  const product = await getProduct(id);
+  if (!product) return;
+  return {
+    title: product.title,
+  };
+}
+
 const ProductDetail = async ({ params }: { params: { id: string } }) => {
   const id = Number(params.id);
   if (isNaN(id)) return notFound();
@@ -50,7 +59,7 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
       },
       select: null,
     });
-    redirect("/products");
+    redirect("/home");
   };
   return (
     <div>
@@ -86,7 +95,7 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
       </div>
       <div className="fixed w-full max-w-md bottom-0 mx-auto p-5 bg-neutral-800 flex justify-between items-center">
         <div className="flex gap-4 items-center">
-          <Link href="/products">
+          <Link href="/home">
             <ChevronLeftIcon className="size-9" />
           </Link>
           <span className="font-semibold text-xl">
