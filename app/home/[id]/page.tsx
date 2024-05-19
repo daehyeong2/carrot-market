@@ -9,6 +9,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { unstable_cache as nextCache, revalidateTag } from "next/cache";
 
 export async function getIsOwner(userId: number) {
   const session = await getSession();
@@ -19,6 +20,7 @@ export async function getIsOwner(userId: number) {
 }
 
 export async function getProduct(id: number) {
+  console.log("product");
   const product = await db.product.findUnique({
     where: {
       id,
@@ -35,9 +37,30 @@ export async function getProduct(id: number) {
   return product;
 }
 
+const getCachedProduct = nextCache(getProduct, ["product-detail"], {
+  tags: ["product-detail"],
+});
+
+async function getProductTitle(id: number) {
+  console.log("title");
+  const product = await db.product.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      title: true,
+    },
+  });
+  return product;
+}
+
+const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
+  tags: ["product-title"],
+});
+
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const id = Number(params.id);
-  const product = await getProduct(id);
+  const product = await getCachedProductTitle(id);
   if (!product) return;
   return {
     title: product.title,
@@ -47,19 +70,20 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 const ProductDetail = async ({ params }: { params: { id: string } }) => {
   const id = Number(params.id);
   if (isNaN(id)) return notFound();
-  const product = await getProduct(id);
+  const product = await getCachedProduct(id);
   if (!product) return notFound();
   const isOwner = await getIsOwner(product.userId);
   const onDelete = async () => {
     "use server";
     if (!isOwner) return;
-    await db.product.delete({
-      where: {
-        id,
-      },
-      select: null,
-    });
-    redirect("/home");
+    revalidateTag("product-title");
+    // await db.product.delete({
+    //   where: {
+    //     id,
+    //   },
+    //   select: null,
+    // });
+    // redirect("/home");
   };
   return (
     <div>
