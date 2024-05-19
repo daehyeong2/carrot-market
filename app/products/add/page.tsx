@@ -17,6 +17,7 @@ const AddProduct = () => {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<ProductType>({
     resolver: zodResolver(productSchema),
@@ -37,7 +38,21 @@ const AddProduct = () => {
     formData.append("description", data.description);
     formData.append("price", data.price + "");
     formData.append("photo", data.photo);
-    return uploadProduct(formData);
+    const errors = await uploadProduct(formData);
+    if (errors) {
+      if (errors.fieldErrors.photo) {
+        setError("photo", { message: errors.fieldErrors.photo[0] });
+      }
+      if (errors.fieldErrors.title) {
+        setError("title", { message: errors.fieldErrors.title[0] });
+      }
+      if (errors.fieldErrors.price) {
+        setError("price", { message: errors.fieldErrors.price[0] });
+      }
+      if (errors.fieldErrors.description) {
+        setError("description", { message: errors.fieldErrors.description[0] });
+      }
+    }
   });
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -95,7 +110,6 @@ const AddProduct = () => {
           className="hidden"
           accept="image/*"
           onChange={onImageChange}
-          required
         />
         <Input
           required
