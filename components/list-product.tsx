@@ -22,7 +22,12 @@ const ListProduct = ({
     <Link href={`/products/${id}`} className="">
       <div className="flex gap-5 items-center">
         <div className="relative size-28 rounded-md overflow-hidden">
-          <Image fill src={photo} alt={title} className="object-cover" />
+          <Image
+            fill
+            src={`${photo}/avatar`}
+            alt={title}
+            className="object-cover"
+          />
         </div>
         <div className="flex flex-col gap-1 *:text-white">
           <span className="text-xl">{title}</span>

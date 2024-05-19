@@ -1,7 +1,11 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { formatToWon } from "@/lib/utils";
-import { ChevronLeftIcon, UserIcon } from "@heroicons/react/24/solid";
+import {
+  ChevronLeftIcon,
+  TrashIcon,
+  UserIcon,
+} from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -53,7 +57,7 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
       <div className="relative aspect-square">
         <Image
           fill
-          src={product.photo}
+          src={`${product.photo}/public`}
           alt={product.title}
           className="object-cover"
         />
@@ -98,8 +102,8 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
           </Link>
           {isOwner ? (
             <form action={onDelete}>
-              <button className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold">
-                Delete product
+              <button className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold flex items-center justify-center">
+                <TrashIcon className="size-6" />
               </button>
             </form>
           ) : null}
