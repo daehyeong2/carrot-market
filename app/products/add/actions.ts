@@ -1,33 +1,11 @@
 "use server";
 
-import { z } from "zod";
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
+import { productSchema } from "./schema";
 
-const productSchema = z.object({
-  photo: z.string({
-    required_error: "사진은 필수입니다.",
-  }),
-  title: z
-    .string({
-      required_error: "제목을 입력해 주세요.",
-      invalid_type_error: "파일을 업로드해 주세요.",
-    })
-    .min(3, "제목을 최소 3자 이상 입력해 주세요."),
-  description: z
-    .string({
-      required_error: "설명을 입력해 주세요.",
-    })
-    .min(3, "설명을 최소 3자 이상 입력해 주세요."),
-  price: z.coerce
-    .number({
-      required_error: "가격을 입력해 주세요.",
-    })
-    .min(1, "가격을 1원 이상 입력해 주세요."),
-});
-
-export async function uploadProduct(_: any, formData: FormData) {
+export async function uploadProduct(formData: FormData) {
   const session = await getSession();
   if (!session.id) return;
   const data = {
