@@ -1,15 +1,11 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { formatToWon, getProduct } from "@/lib/utils";
-import {
-  ChevronLeftIcon,
-  TrashIcon,
-  UserIcon,
-} from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { unstable_cache as nextCache, revalidateTag } from "next/cache";
+import { notFound } from "next/navigation";
+import { unstable_cache as nextCache } from "next/cache";
 
 const getCachedProduct = nextCache(getProduct, ["product-detail"], {
   tags: ["product-detail"],
@@ -28,7 +24,7 @@ async function getProductTitle(id: number) {
 }
 
 const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
-  tags: ["product-title"],
+  tags: ["product-title", "product-detail"],
 });
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
@@ -45,21 +41,8 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
   if (isNaN(id)) return notFound();
   const product = await getCachedProduct(id);
   if (!product) return notFound();
-  // const session = await getSession();
-  // const isOwner = session.id === product.userId;
-  const isOwner = false;
-  const onDelete = async () => {
-    "use server";
-    if (!isOwner) return;
-    revalidateTag("product-title");
-    // await db.product.delete({
-    //   where: {
-    //     id,
-    //   },
-    //   select: null,
-    // });
-    // redirect("/home");
-  };
+  const session = await getSession();
+  const isOwner = session.id === product.userId;
   return (
     <div>
       <div className="relative aspect-square">
@@ -109,11 +92,12 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
             채팅하기
           </Link>
           {isOwner ? (
-            <form action={onDelete}>
-              <button className="bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold flex items-center justify-center">
-                <TrashIcon className="size-6" />
-              </button>
-            </form>
+            <Link
+              href={`/home/${id}/edit`}
+              className="flex items-center justify-center px-5 py-2.5 bg-blue-500 rounded-md text-white font-semibold"
+            >
+              편집
+            </Link>
           ) : null}
         </div>
       </div>
@@ -122,14 +106,3 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
 };
 
 export default ProductDetail;
-
-export async function generateStaticParams() {
-  const products = await db.product.findMany({
-    select: {
-      id: true,
-    },
-  });
-  return products.map((product) => ({
-    id: product.id + "",
-  }));
-}

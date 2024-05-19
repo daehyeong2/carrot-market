@@ -7,9 +7,13 @@ interface SessionContent {
   id?: number;
 }
 
-export default async function getSession() {
-  return await getIronSession<SessionContent>(cookies(), {
+export default async function getSession(isPlain?: boolean) {
+  const session = await getIronSession<SessionContent>(cookies(), {
     cookieName: "session",
     password: process.env.COOKIE_SECRET!,
   });
+  if (isPlain) {
+    return { id: session.id };
+  }
+  return session;
 }

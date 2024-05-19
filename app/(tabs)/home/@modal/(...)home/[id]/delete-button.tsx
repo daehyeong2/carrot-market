@@ -1,19 +1,26 @@
 "use client";
 
-import { TrashIcon } from "@heroicons/react/24/solid";
 import { onDelete } from "./actins";
+import { useState } from "react";
 
 const DeleteButton = ({ id, isOwner }: { id: number; isOwner: boolean }) => {
+  const [isLoading, setLoading] = useState(false);
   const onClick = async () => {
+    const ok = window.confirm("상품을 삭제하시겠습니까?");
+    if (!ok) return;
+    setLoading(true);
     await onDelete(id, isOwner);
+    setLoading(false);
     window.location.href = "/home";
   };
   return (
-    <form action={onClick}>
-      <button className="bg-red-500 px-2.5 py-1.5 rounded-md text-white font-semibold flex items-center justify-center">
-        <TrashIcon className="size-6" />
-      </button>
-    </form>
+    <button
+      onClick={onClick}
+      type="button"
+      className="bg-red-500 w-full h-10 rounded-md text-white font-semibold"
+    >
+      {isLoading ? "삭제하는 중.." : "삭제하기"}
+    </button>
   );
 };
 

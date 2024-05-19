@@ -3,7 +3,6 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { formatToWon, getProduct } from "@/lib/utils";
 import Link from "next/link";
-import DeleteButton from "./delete-button";
 import getSession from "@/lib/session";
 
 const Modal = async ({ params }: { params: { id: string } }) => {
@@ -48,7 +47,14 @@ const Modal = async ({ params }: { params: { id: string } }) => {
               >
                 채팅하기
               </Link>
-              <DeleteButton id={id} isOwner={isOwner} />
+              {isOwner ? (
+                <Link
+                  href={`/home/${id}/edit`}
+                  className="flex items-center justify-center px-2.5 py-1.5 bg-blue-500 rounded-md text-white font-semibold"
+                >
+                  편집
+                </Link>
+              ) : null}
             </div>
           </div>
         </div>

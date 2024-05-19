@@ -12,7 +12,7 @@ const SocialLogin = () => {
           href="/github/start"
         >
           <span>
-            <Image className="size-6" src="/github.svg" alt="Github Logo" />
+            <Image width={24} height={24} src="/github.svg" alt="Github Logo" />
           </span>
           <span>Continue with Github</span>
         </Link>

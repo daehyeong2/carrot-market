@@ -2,7 +2,7 @@ import db from "./db";
 import getSession from "./session";
 
 export const LogIn = async (id: number) => {
-  const session = await getSession();
+  const session: any = await getSession();
   session.id = id;
   await session.save();
 };
