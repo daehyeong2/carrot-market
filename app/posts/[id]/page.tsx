@@ -1,15 +1,11 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { formatToTimeAgo } from "@/lib/utils";
-import {
-  EyeIcon,
-  HandThumbUpIcon as SolidHandThumbUpIcon,
-} from "@heroicons/react/24/solid";
-import { HandThumbUpIcon as OutlineHandThumbUpIcon } from "@heroicons/react/24/outline";
-import { revalidateTag } from "next/cache";
+import { EyeIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { unstable_cache as nextCache } from "next/cache";
+import LikeButton from "@/components/like-button";
 
 const getPost = async (id: number) => {
   try {
@@ -78,34 +74,6 @@ const PostDetail = async ({ params }: { params: { id: string } }) => {
   if (!post) {
     return notFound();
   }
-  const likePost = async () => {
-    "use server";
-    const session = await getSession();
-    try {
-      await db.like.create({
-        data: {
-          postId: id,
-          userId: session.id!,
-        },
-      });
-      revalidateTag(`like-status-${id}`);
-    } catch (e) {}
-  };
-  const dislikePost = async () => {
-    "use server";
-    const session = await getSession();
-    try {
-      await db.like.delete({
-        where: {
-          id: {
-            postId: id,
-            userId: session.id!,
-          },
-        },
-      });
-      revalidateTag(`like-status-${id}`);
-    } catch (e) {}
-  };
   const { likeCount, isLiked } = await getCachedLikeStatus(id, session.id!);
   return (
     <div className="p-5 text-white">
@@ -131,26 +99,7 @@ const PostDetail = async ({ params }: { params: { id: string } }) => {
           <EyeIcon className="size-5" />
           <span>조회 {post.views}</span>
         </div>
-        <form action={isLiked ? dislikePost : likePost}>
-          <button
-            className={`flex items-center gap-2 text-neutral-400 text-sm border border-neutral-400 rounded-full p-2 transition-colors ${
-              isLiked
-                ? "bg-orange-500 text-white border-orange-500"
-                : "hover:bg-neutral-800"
-            }`}
-          >
-            {isLiked ? (
-              <SolidHandThumbUpIcon className="size-5" />
-            ) : (
-              <OutlineHandThumbUpIcon className="size-5" />
-            )}
-            {isLiked ? (
-              <span>{likeCount}</span>
-            ) : (
-              <span>공감하기 ({likeCount})</span>
-            )}
-          </button>
-        </form>
+        <LikeButton isLiked={isLiked} likeCount={likeCount} postId={id} />
       </div>
     </div>
   );
