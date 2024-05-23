@@ -86,7 +86,6 @@ const ChatRoom = async ({ params }: { params: { id: string } }) => {
   if (!room) {
     return notFound();
   }
-  const users = room.users;
   const initialMessages = await getMessages(params.id);
   const session = await getSession();
   const readMessage = async (messageId: number) => {
@@ -125,12 +124,14 @@ const ChatRoom = async ({ params }: { params: { id: string } }) => {
         id: true,
       },
     });
+    const users = room.users;
     revalidateTag(
       `user-profile-${users.filter((user) => user.id !== session.id)[0]}`
     );
     revalidateTag(`user-profile-${session.id}`);
     revalidateTag("chat-list");
   };
+  const users = room.users;
   return (
     <ChatMessagesList
       chatRoomId={params.id}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { unstable_cache as nextCache } from "next/cache";
 import { formatToTimeAgo } from "@/lib/utils";
+import { UserIcon } from "@heroicons/react/24/solid";
 
 const getUser = async (userId: number) => {
   const user = await db.user.findUnique({
@@ -114,13 +115,21 @@ const Profile = async ({ params }: { params: { id: string } }) => {
   return (
     <div className="flex flex-col gap-7 p-5">
       <div className="flex gap-5 items-center">
-        <Image
-          src={`${user.avatar}/avatar`}
-          alt={user.username}
-          width={64}
-          height={64}
-          className="size-16 rounded-full"
-        />
+        {user.avatar ? (
+          <Image
+            src={`${
+              user.avatar?.startsWith("https://")
+                ? `${user.avatar}/avatar`
+                : user.avatar
+            }/avatar`}
+            alt={user.username}
+            width={64}
+            height={64}
+            className="size-16 rounded-full"
+          />
+        ) : (
+          <UserIcon className="size-16" />
+        )}
         <h1 className="text-3xl">{user.username}님의 프로필</h1>
       </div>
       <div className="flex flex-col gap-3">

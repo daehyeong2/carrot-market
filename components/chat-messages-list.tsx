@@ -3,7 +3,11 @@
 import { saveMessage } from "@/app/chats/[id]/actions";
 import { InitialChatMessages } from "@/app/chats/[id]/page";
 import { formatToTimeAgo } from "@/lib/utils";
-import { ArrowUpCircleIcon, ChevronLeftIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowUpCircleIcon,
+  ChevronLeftIcon,
+  UserIcon,
+} from "@heroicons/react/24/solid";
 import { RealtimeChannel, createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
@@ -140,15 +144,18 @@ const ChatMessagesList = ({
               message.userId === userId && "justify-end"
             }`}
           >
-            {message.userId !== userId && (
-              <Image
-                src={message.user.avatar ?? ""}
-                alt={message.user.username}
-                width={50}
-                height={50}
-                className="size-8 rounded-full"
-              />
-            )}
+            {message.userId !== userId &&
+              (message.user.avatar ? (
+                <Image
+                  src={message.user.avatar}
+                  alt={message.user.username}
+                  width={50}
+                  height={50}
+                  className="size-8 rounded-full"
+                />
+              ) : (
+                <UserIcon className="size-8 rounded-full" />
+              ))}
             <div className="flex flex-col gap-1">
               <span
                 className={`${

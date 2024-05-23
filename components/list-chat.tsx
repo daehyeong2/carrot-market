@@ -1,3 +1,4 @@
+import { UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -28,13 +29,21 @@ const ListChat = ({ id, users, messages, userId }: IListChatProps) => {
       href={`/chats/${id}`}
       className="flex gap-5 p-5 items-center hover:opacity-80 transition-opacity"
     >
-      <Image
-        src={user.avatar ?? ""}
-        alt={user.username}
-        width={60}
-        height={60}
-        className="rounded-md"
-      />
+      {user.avatar ? (
+        <Image
+          src={
+            user.avatar.startsWith("https://github.com")
+              ? user.avatar
+              : `${user.avatar}/avatar`
+          }
+          alt={user.username}
+          width={60}
+          height={60}
+          className="rounded-md"
+        />
+      ) : (
+        <UserIcon className="size-14 text-white" />
+      )}
       <div>
         <h2 className="text-lg text-white">{user.username}</h2>
         {message && (
