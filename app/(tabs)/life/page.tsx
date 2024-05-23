@@ -36,6 +36,7 @@ const LifePage = async () => {
   const posts = await getCachedPosts();
   return (
     <div className="p-5 flex flex-col">
+      <h1 className="text-4xl mb-3">동네생활</h1>
       {posts.map((post) => (
         <Link
           className="pb-5 mb-5 border-b border-neutral-400 text-neutral-400 flex flex-col last:pb-0 last:border-b-0"
