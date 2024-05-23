@@ -21,6 +21,7 @@ interface IListChatProps {
 
 const ListChat = ({ id, users, messages, userId }: IListChatProps) => {
   const user = users[0];
+  if (!user) return;
   const message = messages[0];
   return (
     <Link

@@ -1,5 +1,6 @@
 import db from "@/lib/db";
 import getSession from "@/lib/session";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 const getUser = async () => {
@@ -26,8 +27,20 @@ const Profile = async () => {
     redirect("/");
   };
   return (
-    <div>
+    <div className="flex flex-col gap-3">
       <h1>Welcome! {user?.username}!</h1>
+      <Link
+        href={`/user/${user.id}`}
+        className="py-2 px-4 bg-orange-500 rounded-md text-white w-fit"
+      >
+        See Profile
+      </Link>
+      <Link
+        className="px-3 py-2 rounded-md bg-blue-500 w-fit cursor-pointer text-white"
+        href={`/profile/edit`}
+      >
+        프로필 수정
+      </Link>
       <form action={logOut}>
         <button>Log out</button>
       </form>

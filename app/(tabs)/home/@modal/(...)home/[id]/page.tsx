@@ -17,6 +17,19 @@ const Modal = async ({ params }: { params: { id: string } }) => {
   const isOwner = session.id === product.userId;
   const createChatRoom = async () => {
     "use server";
+    if (product.isSold) return;
+    const roomExists = await db.chatRoom.findFirst({
+      where: {
+        productId: product.id,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (roomExists) {
+      revalidateTag("chat-list");
+      return redirect(`/chats/${roomExists.id}`);
+    }
     const room = await db.chatRoom.create({
       data: {
         users: {
@@ -29,6 +42,7 @@ const Modal = async ({ params }: { params: { id: string } }) => {
             },
           ],
         },
+        productId: id,
       },
       select: {
         id: true,
@@ -57,7 +71,7 @@ const Modal = async ({ params }: { params: { id: string } }) => {
                 alt={product.user.username}
                 width={40}
                 height={40}
-                className="object-cover"
+                className="object-cover rounded-full"
                 priority
               />
             ) : (
@@ -71,11 +85,6 @@ const Modal = async ({ params }: { params: { id: string } }) => {
           <div className="flex justify-between mt-6 items-center">
             <h3 className="font-semibold">{formatToWon(product.price)}원</h3>
             <div className="flex gap-3">
-              <form action={createChatRoom}>
-                <button className="bg-orange-500 px-2.5 py-1.5 rounded-md text-white font-semibold">
-                  채팅하기
-                </button>
-              </form>
               {isOwner ? (
                 <Link
                   href={`/home/${id}/edit`}
@@ -83,7 +92,13 @@ const Modal = async ({ params }: { params: { id: string } }) => {
                 >
                   편집
                 </Link>
-              ) : null}
+              ) : (
+                <form action={createChatRoom}>
+                  <button className="bg-orange-500 px-2.5 py-1.5 rounded-md text-white font-semibold">
+                    채팅하기
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>

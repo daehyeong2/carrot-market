@@ -106,7 +106,6 @@ export const createAccount = async (prevState: any, formData: FormData) => {
   };
   const result = await formSchema.spa(data);
   if (!result.success) {
-    console.log(result.error.flatten());
     return result.error.flatten();
   } else {
     const hashedPassword = await bcrypt.hash(result.data.password, 12);

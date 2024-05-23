@@ -9,6 +9,7 @@ import { unstable_cache as nextCache, revalidateTag } from "next/cache";
 
 const getCachedProduct = nextCache(getProduct, ["product-detail"], {
   tags: ["product-detail"],
+  revalidate: 300,
 });
 
 async function getProductTitle(id: number) {
@@ -25,6 +26,7 @@ async function getProductTitle(id: number) {
 
 const getCachedProductTitle = nextCache(getProductTitle, ["product-title"], {
   tags: ["product-title", "product-detail"],
+  revalidate: 300,
 });
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
@@ -45,6 +47,19 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
   const isOwner = session.id === product.userId;
   const createChatRoom = async () => {
     "use server";
+    if (product.isSold) return;
+    const roomExists = await db.chatRoom.findFirst({
+      where: {
+        productId: product.id,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (roomExists) {
+      revalidateTag("chat-list");
+      return redirect(`/chats/${roomExists.id}`);
+    }
     const room = await db.chatRoom.create({
       data: {
         users: {
@@ -57,6 +72,7 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
             },
           ],
         },
+        productId: id,
       },
       select: {
         id: true,
@@ -109,11 +125,6 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <form action={createChatRoom}>
-            <button className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold">
-              채팅하기
-            </button>
-          </form>
           {isOwner ? (
             <Link
               href={`/home/${id}/edit`}
@@ -121,7 +132,13 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
             >
               편집
             </Link>
-          ) : null}
+          ) : (
+            <form action={createChatRoom}>
+              <button className="bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold">
+                채팅하기
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

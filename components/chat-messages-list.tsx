@@ -3,9 +3,10 @@
 import { saveMessage } from "@/app/chats/[id]/actions";
 import { InitialChatMessages } from "@/app/chats/[id]/page";
 import { formatToTimeAgo } from "@/lib/utils";
-import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
+import { ArrowUpCircleIcon, ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { RealtimeChannel, createClient } from "@supabase/supabase-js";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const SUPABASE_PUBLIC_KEY =
@@ -15,19 +16,30 @@ const SUPABASE_URL = "https://hzgwpxauibwjxwzhnfbv.supabase.co";
 interface IChatMessagesListProps {
   initialMessages: InitialChatMessages;
   userId: number;
+  buyerId: number;
   chatRoomId: string;
   username: string;
   avatar: string;
+  product: {
+    id: number;
+    title: string;
+    isSold: boolean;
+    userId: number;
+  };
+  onSold: () => void;
   readMessage: (messageId: number) => void;
 }
 
 const ChatMessagesList = ({
   initialMessages,
   userId,
+  buyerId,
   chatRoomId,
   username,
   avatar,
   readMessage,
+  product,
+  onSold,
 }: IChatMessagesListProps) => {
   const [messages, setMessages] = useState(initialMessages);
   const [message, setMessage] = useState("");
@@ -85,40 +97,75 @@ const ChatMessagesList = ({
       channel.current?.unsubscribe();
     };
   }, []);
+  const ulRef = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    if (ulRef.current) {
+      ulRef.current.scrollTop = ulRef.current.scrollHeight;
+    }
+  }, [ulRef]);
   return (
-    <div className="p-5 flex flex-col gap-5 min-h-screen justify-end">
-      {messages.map((message) => (
-        <div
-          key={message.id}
-          className={`flex gap-2 items-start ${
-            message.userId === userId && "justify-end"
-          }`}
-        >
-          {message.userId !== userId && (
-            <Image
-              src={message.user.avatar ?? ""}
-              alt={message.user.username}
-              width={50}
-              height={50}
-              className="size-8 rounded-full"
-            />
-          )}
-          <div className="flex flex-col gap-1">
-            <span
-              className={`${
-                message.userId === userId ? "bg-orange-500" : "bg-neutral-500"
-              } p-2.5 rounded-md`}
-            >
-              {message.payload}
-            </span>
-            <span
-              className={`text-xs ${message.userId === userId && "text-end"}`}
-            >
-              {formatToTimeAgo(message.created_at.toString())}
-            </span>
-          </div>
+    <div className="py-5 flex flex-col gap-5 h-screen">
+      <div className="w-full flex justify-between border-b-neutral-600 items-center">
+        <div className="flex gap-5">
+          <Link href="/chat">
+            <ChevronLeftIcon className="size-8 text-white cursor-pointer" />
+          </Link>
+          <h1 className="text-2xl">{product.title}</h1>
         </div>
-      ))}
+        {product.isSold ? (
+          <Link
+            className="py-2 px-3 bg-orange-500 rounded-md cursor-pointer text-white"
+            href={`/user/${
+              product.userId === userId ? buyerId : product.userId
+            }/review`}
+          >
+            리뷰 남기기
+          </Link>
+        ) : (
+          <form action={onSold}>
+            <button className="py-2 px-3 bg-orange-500 rounded-md cursor-pointer">
+              판매 완료
+            </button>
+          </form>
+        )}
+      </div>
+      <ul
+        className="px-3 flex flex-col gap-5 overflow-y-auto flex-1 justify-end"
+        ref={ulRef}
+      >
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex gap-2 items-start ${
+              message.userId === userId && "justify-end"
+            }`}
+          >
+            {message.userId !== userId && (
+              <Image
+                src={message.user.avatar ?? ""}
+                alt={message.user.username}
+                width={50}
+                height={50}
+                className="size-8 rounded-full"
+              />
+            )}
+            <div className="flex flex-col gap-1">
+              <span
+                className={`${
+                  message.userId === userId ? "bg-orange-500" : "bg-neutral-500"
+                } p-2.5 rounded-md`}
+              >
+                {message.payload}
+              </span>
+              <span
+                className={`text-xs ${message.userId === userId && "text-end"}`}
+              >
+                {formatToTimeAgo(message.created_at.toString())}
+              </span>
+            </div>
+          </div>
+        ))}
+      </ul>
       <form className="flex relative" onSubmit={onSubmit}>
         <input
           required

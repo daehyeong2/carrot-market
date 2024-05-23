@@ -88,7 +88,7 @@ const getUser = async (userId: number) => {
 
 const getCachedUser = (userId: number) => {
   const cachedOperation = nextCache(getUser, [`user-info-${userId}`], {
-    tags: [`user-info-${userId}`],
+    tags: [`user-${userId}`, `user-info-${userId}`],
   });
   return cachedOperation(userId);
 };

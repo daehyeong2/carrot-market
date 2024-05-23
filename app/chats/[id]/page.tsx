@@ -16,6 +16,14 @@ async function getRoom(id: string) {
           id: true,
         },
       },
+      product: {
+        select: {
+          id: true,
+          title: true,
+          isSold: true,
+          userId: true,
+        },
+      },
     },
   });
   if (room) {
@@ -54,6 +62,7 @@ async function getUserProfile(userId: number) {
       id: userId,
     },
     select: {
+      id: true,
       username: true,
       avatar: true,
     },
@@ -77,6 +86,7 @@ const ChatRoom = async ({ params }: { params: { id: string } }) => {
   if (!room) {
     return notFound();
   }
+  const users = room.users;
   const initialMessages = await getMessages(params.id);
   const session = await getSession();
   const readMessage = async (messageId: number) => {
@@ -102,14 +112,36 @@ const ChatRoom = async ({ params }: { params: { id: string } }) => {
   if (!user) {
     return notFound();
   }
+  const onSold = async () => {
+    "use server";
+    await db.product.update({
+      where: {
+        id: room.productId,
+      },
+      data: {
+        isSold: true,
+      },
+      select: {
+        id: true,
+      },
+    });
+    revalidateTag(
+      `user-profile-${users.filter((user) => user.id !== session.id)[0]}`
+    );
+    revalidateTag(`user-profile-${session.id}`);
+    revalidateTag("chat-list");
+  };
   return (
     <ChatMessagesList
       chatRoomId={params.id}
       userId={session.id!}
+      buyerId={users.filter((user) => user.id !== session.id)[0].id}
       username={user.username}
       avatar={user.avatar ?? ""}
       initialMessages={initialMessages}
       readMessage={readMessage}
+      product={room.product}
+      onSold={onSold}
     />
   );
 };
