@@ -3,9 +3,9 @@
 import { InitialChatMessages } from "@/app/chats/[id]/page";
 import { formatToTimeAgo } from "@/lib/utils";
 import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
-import { createClient } from "@supabase/supabase-js";
+import { RealtimeChannel, createClient } from "@supabase/supabase-js";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const SUPABASE_PUBLIC_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6Z3dweGF1aWJ3anh3emhuZmJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY0NDU1NjMsImV4cCI6MjAzMjAyMTU2M30.svLKR1Z8xbA8Ph1P-mlABZFMH4Z1zjY9D_QkGJ_aZy8";
@@ -24,6 +24,7 @@ const ChatMessagesList = ({
 }: IChatMessagesListProps) => {
   const [messages, setMessages] = useState(initialMessages);
   const [message, setMessage] = useState("");
+  const channel = useRef<RealtimeChannel>();
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { value },
@@ -45,14 +46,22 @@ const ChatMessagesList = ({
         },
       },
     ]);
+    channel.current?.send({
+      type: "broadcast",
+      event: "message",
+      payload: { message },
+    });
     setMessage("");
   };
   useEffect(() => {
     const client = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
-    const channel = client.channel(`room-${chatRoomId}`);
-    channel.on("broadcast", { event: "message" }, (payload) =>
-      console.log(payload)
-    );
+    channel.current = client.channel(`room-${chatRoomId}`);
+    channel.current
+      .on("broadcast", { event: "message" }, (payload) => console.log(payload))
+      .subscribe();
+    return () => {
+      channel.current?.unsubscribe();
+    };
   }, []);
   return (
     <div className="p-5 flex flex-col gap-5 min-h-screen justify-end">
