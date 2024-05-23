@@ -62,6 +62,7 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
               width={40}
               height={40}
               className="object-cover"
+              priority
             />
           ) : (
             <UserIcon className="" />

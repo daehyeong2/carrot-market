@@ -2,7 +2,7 @@
 
 import db from "@/lib/db";
 import getSession from "@/lib/session";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, unstable_cache as nextCache } from "next/cache";
 
 export const likePost = async (postId: number) => {
   try {
@@ -14,6 +14,7 @@ export const likePost = async (postId: number) => {
       },
     });
     revalidateTag(`like-status-${postId}`);
+    revalidateTag("posts");
   } catch (e) {}
 };
 export const dislikePost = async (postId: number) => {
@@ -28,5 +29,22 @@ export const dislikePost = async (postId: number) => {
       },
     });
     revalidateTag(`like-status-${postId}`);
+    revalidateTag("posts");
   } catch (e) {}
+};
+
+export const createComment = async (
+  postId: number,
+  payload: string,
+  userId: number
+) => {
+  await db.comment.create({
+    data: {
+      payload,
+      userId,
+      postId,
+    },
+  });
+  revalidateTag(`comments-${postId}`);
+  revalidateTag("posts");
 };

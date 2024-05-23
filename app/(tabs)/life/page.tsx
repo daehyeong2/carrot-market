@@ -5,6 +5,7 @@ import {
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { unstable_cache as nextCache } from "next/cache";
 
 const getPosts = async () => {
   const posts = await db.post.findMany({
@@ -25,12 +26,14 @@ const getPosts = async () => {
   return posts;
 };
 
+const getCachedPosts = nextCache(getPosts, ["posts"], { tags: ["posts"] });
+
 export const metadata = {
   title: "동네생활",
 };
 
 const LifePage = async () => {
-  const posts = await getPosts();
+  const posts = await getCachedPosts();
   return (
     <div className="p-5 flex flex-col">
       {posts.map((post) => (

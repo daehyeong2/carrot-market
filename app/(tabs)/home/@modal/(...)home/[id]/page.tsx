@@ -32,6 +32,7 @@ const Modal = async ({ params }: { params: { id: string } }) => {
               width={30}
               height={30}
               className="rounded-full"
+              priority
             />
             <span>{product.user.username}</span>
           </div>
