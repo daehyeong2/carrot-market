@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { formatToWon, getProduct } from "@/lib/utils";
 import Link from "next/link";
 import getSession from "@/lib/session";
+import { UserIcon } from "@heroicons/react/24/solid";
 
 const Modal = async ({ params }: { params: { id: string } }) => {
   const id = Number(params.id);
@@ -26,14 +27,18 @@ const Modal = async ({ params }: { params: { id: string } }) => {
         </div>
         <div className="flex flex-col p-5 gap-5 w-full">
           <div className="flex gap-2 items-center">
-            <Image
-              src={`${product.user.avatar}/avatar`}
-              alt={product.user.username}
-              width={30}
-              height={30}
-              className="rounded-full"
-              priority
-            />
+            {product.user.avatar ? (
+              <Image
+                src={product.user.avatar}
+                alt={product.user.username}
+                width={40}
+                height={40}
+                className="object-cover"
+                priority
+              />
+            ) : (
+              <UserIcon className="size-10" />
+            )}
             <span>{product.user.username}</span>
           </div>
           <div className="h-[1px] w-full rounded-md bg-neutral-600" />
