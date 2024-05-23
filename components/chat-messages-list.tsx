@@ -18,6 +18,7 @@ interface IChatMessagesListProps {
   chatRoomId: string;
   username: string;
   avatar: string;
+  readMessage: (messageId: number) => void;
 }
 
 const ChatMessagesList = ({
@@ -26,6 +27,7 @@ const ChatMessagesList = ({
   chatRoomId,
   username,
   avatar,
+  readMessage,
 }: IChatMessagesListProps) => {
   const [messages, setMessages] = useState(initialMessages);
   const [message, setMessage] = useState("");
@@ -45,6 +47,7 @@ const ChatMessagesList = ({
         payload: message,
         created_at: new Date(),
         userId,
+        isRead: false,
         user: {
           username: "",
           avatar: "",
@@ -59,6 +62,7 @@ const ChatMessagesList = ({
         payload: message,
         created_at: new Date(),
         userId,
+        isRead: false,
         user: {
           username,
           avatar,
@@ -72,9 +76,10 @@ const ChatMessagesList = ({
     const client = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
     channel.current = client.channel(`room-${chatRoomId}`);
     channel.current
-      .on("broadcast", { event: "message" }, (payload) =>
-        setMessages((prevMsgs) => [...prevMsgs, payload.payload])
-      )
+      .on("broadcast", { event: "message" }, (payload) => {
+        readMessage(messages[messages.length - 1].id);
+        setMessages((prevMsgs) => [...prevMsgs, payload.payload]);
+      })
       .subscribe();
     return () => {
       channel.current?.unsubscribe();

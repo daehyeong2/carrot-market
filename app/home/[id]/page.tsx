@@ -5,7 +5,7 @@ import { ChevronLeftIcon, UserIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { unstable_cache as nextCache } from "next/cache";
+import { unstable_cache as nextCache, revalidateTag } from "next/cache";
 
 const getCachedProduct = nextCache(getProduct, ["product-detail"], {
   tags: ["product-detail"],
@@ -62,6 +62,7 @@ const ProductDetail = async ({ params }: { params: { id: string } }) => {
         id: true,
       },
     });
+    revalidateTag("chat-list");
     redirect(`/chats/${room.id}`);
   };
 

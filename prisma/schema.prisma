@@ -107,4 +107,5 @@ model Message {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   chatRoomId String
   userId     Int
+  isRead     Boolean  @default(false)
 }

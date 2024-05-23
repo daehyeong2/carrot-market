@@ -3,7 +3,7 @@ import db from "@/lib/db";
 import getSession from "@/lib/session";
 import { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { unstable_cache as nextCache } from "next/cache";
+import { unstable_cache as nextCache, revalidateTag } from "next/cache";
 
 async function getRoom(id: string) {
   const room = await db.chatRoom.findUnique({
@@ -36,6 +36,7 @@ async function getMessages(chatRoomId: string) {
       payload: true,
       created_at: true,
       userId: true,
+      isRead: true,
       user: {
         select: {
           avatar: true,
@@ -78,6 +79,25 @@ const ChatRoom = async ({ params }: { params: { id: string } }) => {
   }
   const initialMessages = await getMessages(params.id);
   const session = await getSession();
+  const readMessage = async (messageId: number) => {
+    "use server";
+    await db.message.update({
+      where: {
+        id: messageId,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+    revalidateTag(`chat-list`);
+  };
+  if (
+    initialMessages.length > 0 &&
+    initialMessages[initialMessages.length - 1].userId !== session.id! &&
+    !initialMessages[initialMessages.length - 1].isRead
+  ) {
+    readMessage(initialMessages[initialMessages.length - 1].id);
+  }
   const user = await getCachedUserProfile(session.id!);
   if (!user) {
     return notFound();
@@ -89,6 +109,7 @@ const ChatRoom = async ({ params }: { params: { id: string } }) => {
       username={user.username}
       avatar={user.avatar ?? ""}
       initialMessages={initialMessages}
+      readMessage={readMessage}
     />
   );
 };

@@ -1,10 +1,12 @@
 import CloseButton from "@/components/close-button";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { formatToWon, getProduct } from "@/lib/utils";
 import Link from "next/link";
 import getSession from "@/lib/session";
 import { UserIcon } from "@heroicons/react/24/solid";
+import db from "@/lib/db";
+import { revalidateTag } from "next/cache";
 
 const Modal = async ({ params }: { params: { id: string } }) => {
   const id = Number(params.id);
@@ -13,6 +15,28 @@ const Modal = async ({ params }: { params: { id: string } }) => {
   if (!product) return notFound();
   const session = await getSession();
   const isOwner = session.id === product.userId;
+  const createChatRoom = async () => {
+    "use server";
+    const room = await db.chatRoom.create({
+      data: {
+        users: {
+          connect: [
+            {
+              id: product.userId,
+            },
+            {
+              id: session.id!,
+            },
+          ],
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+    revalidateTag("chat-list");
+    redirect(`/chats/${room.id}`);
+  };
   return (
     <div className="absolute z-50 w-full h-full flex items-center justify-center left-0 top-0 bg-black bg-opacity-60">
       <CloseButton />
@@ -47,12 +71,11 @@ const Modal = async ({ params }: { params: { id: string } }) => {
           <div className="flex justify-between mt-6 items-center">
             <h3 className="font-semibold">{formatToWon(product.price)}원</h3>
             <div className="flex gap-3">
-              <Link
-                className="bg-orange-500 px-2.5 py-1.5 rounded-md text-white font-semibold"
-                href={``}
-              >
-                채팅하기
-              </Link>
+              <form action={createChatRoom}>
+                <button className="bg-orange-500 px-2.5 py-1.5 rounded-md text-white font-semibold">
+                  채팅하기
+                </button>
+              </form>
               {isOwner ? (
                 <Link
                   href={`/home/${id}/edit`}

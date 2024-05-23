@@ -14,6 +14,7 @@ interface IListChatProps {
     updated_at: Date;
     chatRoomId: string;
     userId: number;
+    isRead: boolean;
   }[];
   userId: number;
 }
@@ -35,13 +36,20 @@ const ListChat = ({ id, users, messages, userId }: IListChatProps) => {
       />
       <div>
         <h2 className="text-lg text-white">{user.username}</h2>
-        <h3 className="text-sm text-neutral-500">
-          <span className="text-neutral-400">
-            {message.userId === userId ? "나" : user.username}:
-          </span>{" "}
-          {message.payload}
-        </h3>
+        {message && (
+          <>
+            <h3 className="text-sm text-neutral-500">
+              <span className="text-neutral-400">
+                {message.userId === userId ? "나" : user.username}:
+              </span>{" "}
+              {message.payload}
+            </h3>
+          </>
+        )}
       </div>
+      {message && !message.isRead && message.userId !== userId && (
+        <div className="size-2 rounded-full bg-white ml-auto" />
+      )}
     </Link>
   );
 };
