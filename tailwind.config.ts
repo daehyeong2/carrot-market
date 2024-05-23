@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        roboto: "var(--roboto-text)",
+        rubik: "var(--rubik-text)",
+      },
       borderRadius: {
         "super-small": "1px",
       },
